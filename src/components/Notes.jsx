@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import NoteCard from "./NoteCard.jsx";
 
 const startingNotes = [
@@ -20,9 +20,13 @@ function Notes() {
     return saved ? JSON.parse(saved) : startingNotes;
   });
 
-  const [formData, setFormData] = useState({
-    title: "",
-    body: "",
+  const [formData, setFormData] = useState(() => {
+    const saved = localStorage.getItem("draft");
+    if (saved) {
+      return JSON.parse(saved);
+    } else {
+      return { title: "", body: "" };
+    }
   });
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,9 +75,12 @@ function Notes() {
     titleRef.current.focus();
   }
 
-  const handleDelete = useCallback((id) => {
-    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
-  }, [notes]);
+  const handleDelete = useCallback(
+    (id) => {
+      setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
+    },
+    [],
+  );
 
   const filteredNotes = useMemo(() => {
     return notes.filter((note) =>
