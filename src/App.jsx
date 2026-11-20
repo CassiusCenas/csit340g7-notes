@@ -1,10 +1,21 @@
-import { useState } from 'react'
-import { SettingsContext } from './SettingsContext.js'
-import Notes from './components/Notes.jsx'
-import Info from './components/Info.jsx'
- 
+import { useState, useEffect } from "react";
+import { SettingsContext } from "./SettingsContext.js";
+import Notes from "./components/Notes.jsx";
+import Info from "./components/Info.jsx";
+
 function App() {
-  const [largeText, setLargeText] = useState(false)
+  const [largeText, setLargeText] = useState(() => {
+    const saved = localStorage.getItem("largeText");
+    if (saved !== null) {
+      return JSON.parse(saved);
+    } else {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("largeText", JSON.stringify(largeText));
+  }, [largeText]);
 
   return (
     <SettingsContext value={{ largeText, setLargeText }}>
@@ -13,7 +24,7 @@ function App() {
         <Info name="Cassius L. Cenas" />
       </div>
     </SettingsContext>
-  )
+  );
 }
- 
-export default App
+
+export default App;
