@@ -59,7 +59,7 @@ function Notes() {
     }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const trimmedTitle = formData.title.trim();
@@ -67,21 +67,26 @@ function Notes() {
 
     if (!trimmedTitle || !trimmedBody) return;
 
-    const newNote = {
-      id: Date.now(),
-      title: trimmedTitle,
-      body: trimmedBody,
-    };
-
-    setNotes((prevNotes) => [...prevNotes, newNote]);
-
-    setFormData({
-      title: "",
-      body: "",
-    });
-    titleRef.current.focus();
+    try {
+      const res = await fetch(API_URL + "/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: trimmedTitle, body: trimmedBody }),
+      });
+      if (!res.ok) {
+        throw new Error("The server answered " + res.status);
+      }
+      const newNote = await res.json();
+      setNotes((prevNotes) => [...prevNotes, newNote]);
+      setFormData({
+        title: "",
+        body: "",
+      });
+      titleRef.current.focus();
+    } catch (err) {
+      setError(err.message);
+    }
   }
-
   const handleDelete = useCallback((id) => {
     setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
   }, []);
